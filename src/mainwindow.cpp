@@ -84,7 +84,7 @@ MainWindow::setupMenu()
     auto *save_action = new QAction(save_note_icon, tr("&Save"), this);
     save_action->setShortcut(QKeySequence::Save);
     save_action->setToolTip(tr("Save"));
-    connect(save_action, &QAction::triggered, this, [this]() { m_currentDocument->save(); });
+    connect(save_action, &QAction::triggered, this, &MainWindow::save);
 
     const QIcon exit_icon   = QIcon::fromTheme("application-exit", QIcon(":/images/exit.png"));
     auto *      exit_action = new QAction(exit_icon, tr("&exit"), this);
@@ -149,7 +149,7 @@ MainWindow::setupConnects()
         }
 
         m_textEdit->setDocument(&m_currentDocument->document());
-        m_treeModel->setDocumentHeaders(m_currentDocument->tags());
+        m_treeModel->setDocumentHeaders(m_currentDocument->headers());
     });
 
     connect(m_treeView, &QTreeView::clicked, this, [this](const QModelIndex &index) {
@@ -173,4 +173,11 @@ MainWindow::open()
         m_noteCollection.setCollectionPath(m_notePath);
         m_fileListModel->setStringList(m_noteCollection.noteFiles());
     }
+}
+
+void
+MainWindow::save()
+{
+    m_currentDocument->save();
+    m_treeModel->setDocumentHeaders(m_currentDocument->headers());
 }

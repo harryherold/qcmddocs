@@ -1,3 +1,4 @@
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>
 #include <QPlainTextDocumentLayout>
@@ -9,6 +10,12 @@
 #include <header_iterator.hpp>
 #include <note_document.hpp>
 
+QByteArray
+createDocumentHash(const QTextDocument &document)
+{
+    return QCryptographicHash::hash(document.toPlainText().toUtf8(), QCryptographicHash::Md5);
+}
+
 NoteDocument::NoteDocument(const QString &file_path) : m_filePath(file_path)
 {
     QFile file(file_path);
@@ -19,12 +26,14 @@ NoteDocument::NoteDocument(const QString &file_path) : m_filePath(file_path)
 
     QTextStream file_in(&file);
     m_document.setPlainText(file_in.readAll());
-    m_root = NoteTree<Tag>::create({QString("Navigation"), 0});
 
-    auto header = HeaderIterator(m_document);
-    fillTree(m_root, header);
+    m_headerTreeRoot = NoteTree<Tag>::create({QString("Navigation"), 0});
+
+    parseHeaders();
 
     m_highlighter = std::make_unique<MarkdownHighlighter>(&m_document);
+
+    m_documentHash = createDocumentHash(m_document);
 }
 
 QTextDocument &
@@ -34,25 +43,38 @@ NoteDocument::document()
 }
 
 SharedNoteTreePtr<Tag>
-NoteDocument::tags()
+NoteDocument::headers()
 {
-    return m_root;
+    return m_headerTreeRoot;
 }
 
 void
-NoteDocument::save() const
+NoteDocument::save()
 {
-    // TODO re-create tag tree
-    QTextDocumentWriter document_writer(m_filePath);
-    auto                ret = document_writer.write(&m_document);
-    if (!ret)
+    auto currentHash = createDocumentHash(m_document);
+    if (m_documentHash == currentHash)
     {
-        qDebug() << "Write to " << m_filePath << " failed";
+        qDebug() << "No changes since the last save/load.";
+        return;
+    }
+
+    QTextDocumentWriter document_writer(m_filePath);
+    auto                writeSuccessful = document_writer.write(&m_document);
+
+    if (writeSuccessful)
+    {
+        m_headerTreeRoot->removeChilds();
+        parseHeaders();
+        m_documentHash = currentHash;
+    }
+    else
+    {
+        qDebug() << "Write to " << m_filePath << " failed!";
     }
 }
 
 void
-NoteDocument::fillTree(SharedNoteTreePtr<Tag> root, HeaderIterator &header, int current_level)
+NoteDocument::fillHeaderTree(SharedNoteTreePtr<Tag> root, HeaderIterator &header, int current_level)
 {
     Q_ASSERT(root != nullptr);
 
@@ -73,7 +95,7 @@ NoteDocument::fillTree(SharedNoteTreePtr<Tag> root, HeaderIterator &header, int 
             else
             {
                 // next level
-                fillTree(root->lastChild(), header, current_level + 1);
+                fillHeaderTree(root->lastChild(), header, current_level + 1);
             }
         }
         else // header.level() <= current_level go down
@@ -81,4 +103,11 @@ NoteDocument::fillTree(SharedNoteTreePtr<Tag> root, HeaderIterator &header, int 
             break;
         }
     }
+}
+
+void
+NoteDocument::parseHeaders()
+{
+    auto header = HeaderIterator(m_document);
+    fillHeaderTree(m_headerTreeRoot, header);
 }
