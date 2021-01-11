@@ -50,3 +50,6 @@ add_executable(qcmddocs
 target_link_libraries(qcmddocs PRIVATE Qt5::Widgets)
 target_include_directories(qcmddocs PRIVATE ${QMARKDOWN_EDIT_PATH})
 target_include_directories(qcmddocs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
+
+include(CTest)
+add_subdirectory(tests)
