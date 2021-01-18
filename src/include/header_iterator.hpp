@@ -26,7 +26,7 @@ class HeaderIterator
     HeaderIterator
     operator++(int);
 
-    QTextFragment
+    QString
     headerText() const;
 
     int
@@ -36,7 +36,11 @@ class HeaderIterator
     iterate();
 
   private:
-    std::shared_ptr<QTextDocument> m_markdownDocument;
-    QTextBlock                     m_block_current{};
-    int                            m_level{0};
+    QTextBlock m_block_current{};
+    int        m_level{0};
+    QString    m_header_text;
+    int        m_position{0};
+
+    int
+    headerLevel(const QString &s, int indent);
 };

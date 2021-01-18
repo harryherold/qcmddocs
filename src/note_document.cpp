@@ -6,10 +6,8 @@
 #include <QTextDocumentWriter>
 #include <QTextStream>
 
-
 #include <header_iterator.hpp>
 #include <note_document.hpp>
-
 
 NoteDocument::NoteDocument(const QString &file_path) : m_filePath(file_path)
 {
@@ -21,7 +19,6 @@ NoteDocument::NoteDocument(const QString &file_path) : m_filePath(file_path)
 
     QTextStream file_in(&file);
     m_document.setPlainText(file_in.readAll());
-
     m_root = NoteTree<Tag>::create({QString("Navigation"), 0});
 
     auto header = HeaderIterator(m_document);
@@ -63,7 +60,7 @@ NoteDocument::fillTree(SharedNoteTreePtr<Tag> root, HeaderIterator &header, int 
     {
         if (header.level() == current_level)
         {
-            root->appendChild(Tag{header.headerText().text(), header.headerText().position()});
+            root->appendChild(Tag{header.headerText(), header.position()});
             ++header;
         }
         else if (header.level() > current_level)
