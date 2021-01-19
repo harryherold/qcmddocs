@@ -4,7 +4,6 @@
 #include <QPlainTextDocumentLayout>
 #include <QString>
 #include <QTextBlock>
-#include <QTextDocumentWriter>
 #include <QTextStream>
 
 #include <header_iterator.hpp>
@@ -58,19 +57,20 @@ NoteDocument::save()
         return;
     }
 
-    QTextDocumentWriter document_writer(m_filePath);
-    auto                writeSuccessful = document_writer.write(&m_document);
+    auto file = QFile{m_filePath};
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug() << "Could not open file " << m_filePath << " failed!";
+        return;
+    }
 
-    if (writeSuccessful)
-    {
-        m_headerTreeRoot->removeChilds();
-        parseHeaders();
-        m_documentHash = currentHash;
-    }
-    else
-    {
-        qDebug() << "Write to " << m_filePath << " failed!";
-    }
+    QTextStream fileOut(&file);
+    fileOut << m_document.toPlainText();
+    file.close();
+
+    m_headerTreeRoot->removeChilds();
+    parseHeaders();
+    m_documentHash = currentHash;
 }
 
 void
