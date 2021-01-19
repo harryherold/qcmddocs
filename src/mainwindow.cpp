@@ -66,27 +66,24 @@ MainWindow::setupLayout()
 void
 MainWindow::setupMenu()
 {
-    const QIcon open_icon = QIcon::fromTheme("document-open", QIcon(":/images/open.png"));
-
-    auto *open_action = new QAction(open_icon, tr("&Cmddocs folder"), this);
+    const QIcon open_icon(":/images/open.png");
+    auto *      open_action = new QAction(open_icon, tr("&Cmddocs folder"), this);
     open_action->setShortcuts(QKeySequence::Open);
     open_action->setStatusTip(tr("Open docments folder"));
     connect(open_action, &QAction::triggered, this, &MainWindow::open);
 
-    const QIcon new_file_icon = QIcon::fromTheme("file-new", QIcon(":/images/newfile.png"));
-
-    auto *new_file_action = new QAction(new_file_icon, tr("&New file"), this);
+    const QIcon new_file_icon(":/images/newfile.png");
+    auto *      new_file_action = new QAction(new_file_icon, tr("&New file"), this);
     new_file_action->setShortcuts(QKeySequence::New);
     new_file_action->setToolTip(tr("New markdown file"));
 
-    const QIcon save_note_icon = QIcon::fromTheme("file-save", QIcon(":/images/save.png"));
-
-    auto *save_action = new QAction(save_note_icon, tr("&Save"), this);
+    const QIcon save_note_icon(":/images/save.png");
+    auto *      save_action = new QAction(save_note_icon, tr("&Save"), this);
     save_action->setShortcut(QKeySequence::Save);
     save_action->setToolTip(tr("Save"));
     connect(save_action, &QAction::triggered, this, &MainWindow::save);
 
-    const QIcon exit_icon   = QIcon::fromTheme("application-exit", QIcon(":/images/exit.png"));
+    const QIcon exit_icon(":/images/exit.png");
     auto *      exit_action = new QAction(exit_icon, tr("&exit"), this);
     exit_action->setShortcut(QKeySequence::Quit);
     exit_action->setToolTip(tr("exit"));
