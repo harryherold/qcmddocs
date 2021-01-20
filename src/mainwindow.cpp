@@ -38,6 +38,8 @@ MainWindow::setupViews()
     m_treeView->setModel(m_treeModel);
 }
 
+#include <QSplitter>
+
 void
 MainWindow::setupLayout()
 {
@@ -50,17 +52,17 @@ MainWindow::setupLayout()
     sp_right.setHorizontalStretch(2);
     m_textEdit->setSizePolicy(sp_right);
 
-    auto *vbox_layout = new QVBoxLayout(this);
-    vbox_layout->addWidget(m_listView);
-    vbox_layout->addWidget(m_treeView);
+    auto *splitterLeft = new QSplitter(this);
+    splitterLeft->addWidget(m_listView);
+    splitterLeft->addWidget(m_treeView);
+    splitterLeft->setOrientation(Qt::Orientation::Horizontal);
 
-    auto *hbox_layout = new QHBoxLayout(this);
-    hbox_layout->addLayout(vbox_layout);
-    hbox_layout->addWidget(m_textEdit);
+    auto *splitterRight = new QSplitter(this);
+    splitterRight->addWidget(splitterLeft);
+    splitterRight->addWidget(m_textEdit);
+    splitterLeft->setOrientation(Qt::Orientation::Vertical);
 
-    auto *center_widget = new QWidget(this);
-    center_widget->setLayout(hbox_layout);
-    setCentralWidget(center_widget);
+    setCentralWidget(splitterRight);
 }
 
 void
