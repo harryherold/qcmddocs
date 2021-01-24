@@ -15,24 +15,19 @@ createDocumentHash(const QTextDocument &document)
     return QCryptographicHash::hash(document.toPlainText().toUtf8(), QCryptographicHash::Md5);
 }
 
-NoteDocument::NoteDocument(const QString &file_path) : m_filePath(file_path)
+NoteDocument::NoteDocument(const QString &file_path, Mode mode) : m_filePath(file_path)
 {
-    QFile file(file_path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    switch (mode)
     {
-        throw std::runtime_error("The selected file could not be opened!");
+    case Mode::Open:
+        openDocument();
+        break;
+    case Mode::Create:
+        createDocument();
+        break;
+    default:
+        throw std::runtime_error("Unsupported mode give!");
     }
-
-    QTextStream file_in(&file);
-    m_document.setPlainText(file_in.readAll());
-
-    m_headerTreeRoot = NoteTree<Tag>::create({QString("Navigation"), 0});
-
-    parseHeaders();
-
-    m_highlighter = std::make_unique<MarkdownHighlighter>(&m_document);
-
-    m_documentHash = createDocumentHash(m_document);
 }
 
 QTextDocument &
@@ -110,4 +105,44 @@ NoteDocument::parseHeaders()
 {
     auto header = HeaderIterator(m_document);
     fillHeaderTree(m_headerTreeRoot, header);
+}
+
+void
+NoteDocument::openDocument()
+{
+    QFile file(m_filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        throw std::runtime_error("The selected file could not be opened!");
+    }
+
+    QTextStream file_in(&file);
+    m_document.setPlainText(file_in.readAll());
+
+    m_headerTreeRoot = NoteTree<Tag>::create({QString("Navigation"), 0});
+
+    parseHeaders();
+
+    m_highlighter = std::make_unique<MarkdownHighlighter>(&m_document);
+
+    m_documentHash = createDocumentHash(m_document);
+}
+
+void
+NoteDocument::createDocument()
+{
+    auto file = QFile{m_filePath};
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug() << "Could not create file " << m_filePath << " failed!";
+        return;
+    }
+    file.close();
+    m_document.setPlainText("");
+
+    m_headerTreeRoot = NoteTree<Tag>::create({QString("Navigation"), 0});
+
+    m_highlighter = std::make_unique<MarkdownHighlighter>(&m_document);
+
+    m_documentHash = createDocumentHash(m_document);
 }

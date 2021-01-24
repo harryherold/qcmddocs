@@ -32,6 +32,9 @@ class NoteCollection
     NotePtr
     getNote(const QString &file_path);
 
+    NotePtr
+    createNote(const QString &file_path);
+
   private:
     QStringList                   m_files;
     QDir                          m_note_path;

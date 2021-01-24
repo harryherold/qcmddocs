@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QInputDialog>
 #include <QListView>
 #include <QMenuBar>
 #include <QSizePolicy>
@@ -78,6 +79,7 @@ MainWindow::setupMenu()
     auto *      new_file_action = new QAction(new_file_icon, tr("&New file"), this);
     new_file_action->setShortcuts(QKeySequence::New);
     new_file_action->setToolTip(tr("New markdown file"));
+    connect(new_file_action, &QAction::triggered, this, &MainWindow::createNote);
 
     const QIcon save_note_icon(":/images/save.png");
     auto *      save_action = new QAction(save_note_icon, tr("&Save"), this);
@@ -179,4 +181,19 @@ MainWindow::save()
 {
     m_currentDocument->save();
     m_treeModel->setDocumentHeaders(m_currentDocument->headers());
+}
+
+void
+MainWindow::createNote()
+{
+    bool    accepted = true;
+    QString file = QInputDialog::getText(this, tr("New File"), tr("Markdown File:"), QLineEdit::Normal, "", &accepted);
+    if (accepted)
+    {
+        file += ".md";
+        m_noteCollection.createNote(file);
+        int new_idx = m_fileListModel->rowCount();
+        m_fileListModel->insertRow(new_idx);
+        m_fileListModel->setData(m_fileListModel->index(new_idx), file);
+    }
 }

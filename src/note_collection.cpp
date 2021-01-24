@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QRegularExpression>
 #include <QRegularExpressionMatchIterator>
 #include <QTextDocument>
@@ -39,5 +40,18 @@ NoteCollection::getNote(const QString &file_path)
     {
         m_note_cache.insert(file_path, new NoteDocument(absoluteNotePath(file_path)));
     }
+    return m_note_cache[file_path];
+}
+
+NotePtr
+NoteCollection::createNote(const QString &file_path)
+{
+    if (m_note_cache.contains(file_path))
+    {
+        throw std::runtime_error("Note file already exists!");
+    }
+    m_files.append(file_path);
+    auto file_info = QFileInfo{m_note_path, file_path};
+    m_note_cache.insert(file_path, new NoteDocument(file_info.absoluteFilePath(), NoteDocument::Mode::Create));
     return m_note_cache[file_path];
 }

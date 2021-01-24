@@ -22,8 +22,15 @@ using Tag = QPair<QString, int>;
 
 class NoteDocument
 {
+
   public:
-    explicit NoteDocument(const QString &file);
+    enum class Mode
+    {
+        Open,
+        Create
+    };
+
+    explicit NoteDocument(const QString &file, Mode mode = Mode::Open);
     ~NoteDocument() = default;
     QTextDocument &
     document();
@@ -46,4 +53,10 @@ class NoteDocument
 
     void
     parseHeaders();
+
+    void
+    openDocument();
+
+    void
+    createDocument();
 };

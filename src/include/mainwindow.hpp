@@ -28,6 +28,9 @@ class MainWindow : public QMainWindow
     void
     save();
 
+    void
+    createNote();
+
   private:
     QListView *       m_listView;
     QTreeView *       m_treeView;
