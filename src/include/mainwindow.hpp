@@ -31,6 +31,9 @@ class MainWindow : public QMainWindow
     void
     createNote();
 
+    void
+    increaseFontSize();
+
   private:
     QListView *       m_listView;
     QTreeView *       m_treeView;

@@ -15,6 +15,20 @@ createDocumentHash(const QTextDocument &document)
     return QCryptographicHash::hash(document.toPlainText().toUtf8(), QCryptographicHash::Md5);
 }
 
+NoteHighlighter::NoteHighlighter(QTextDocument *parent, HighlightingOptions highlightingOptions)
+    : MarkdownHighlighter(parent, highlightingOptions)
+{
+}
+
+void
+NoteHighlighter::textFormatFor(std::function<void(QTextCharFormat &)> formatCallback)
+{
+    for (auto iter = _formats.begin(); iter != _formats.end(); ++iter)
+    {
+        formatCallback(iter.value());
+    }
+}
+
 NoteDocument::NoteDocument(const QString &file_path, Mode mode) : m_filePath(file_path)
 {
     switch (mode)
@@ -123,7 +137,7 @@ NoteDocument::openDocument()
 
     parseHeaders();
 
-    m_highlighter = std::make_unique<MarkdownHighlighter>(&m_document);
+    m_highlighter = std::make_unique<NoteHighlighter>(&m_document);
 
     m_documentHash = createDocumentHash(m_document);
 }
@@ -142,7 +156,7 @@ NoteDocument::createDocument()
 
     m_headerTreeRoot = NoteTree<Tag>::create({QString("Navigation"), 0});
 
-    m_highlighter = std::make_unique<MarkdownHighlighter>(&m_document);
+    m_highlighter = std::make_unique<NoteHighlighter>(&m_document);
 
     m_documentHash = createDocumentHash(m_document);
 }

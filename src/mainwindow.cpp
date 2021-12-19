@@ -87,6 +87,11 @@ MainWindow::setupMenu()
     save_action->setToolTip(tr("Save"));
     connect(save_action, &QAction::triggered, this, &MainWindow::save);
 
+    const QIcon plus_icon(":/images/plus.png");
+    auto *      plus_action = new QAction(plus_icon, tr("&plus"), this);
+    plus_action->setToolTip(tr("plus"));
+    connect(plus_action, &QAction::triggered, this, &MainWindow::increaseFontSize);
+
     const QIcon exit_icon(":/images/exit.png");
     auto *      exit_action = new QAction(exit_icon, tr("&exit"), this);
     exit_action->setShortcut(QKeySequence::Quit);
@@ -97,7 +102,30 @@ MainWindow::setupMenu()
     file_tool_bar->addAction(open_action);
     file_tool_bar->addAction(new_file_action);
     file_tool_bar->addAction(save_action);
+    file_tool_bar->addAction(plus_action);
     file_tool_bar->addAction(exit_action);
+}
+
+void
+MainWindow::increaseFontSize()
+{
+    auto incPointSize = [](auto *format) {
+        auto currentSize = format->fontPointSize();
+        if (currentSize < 1)
+        {
+            currentSize = QApplication::font().pointSize();
+        }
+        format->setFontPointSize(currentSize + 1);
+    };
+
+    m_currentDocument->highlighter()->textFormatFor([incPointSize](auto &format) { incPointSize(&format); });
+    auto cursor = m_textEdit->textCursor();
+    m_textEdit->selectAll();
+
+    incPointSize(m_textEdit);
+
+    m_textEdit->selectAll();
+    m_textEdit->setTextCursor(cursor);
 }
 
 void
