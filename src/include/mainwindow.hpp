@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QTextEdit>
+//#include <QTextEdit>
 
 #include <note_collection.hpp>
 #include <tree_model.hpp>
@@ -11,7 +11,9 @@ class QListView;
 class QTreeView;
 class QMenu;
 class QAction;
+class QTextEdit;
 class QStringListModel;
+class QModelIndex;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -55,6 +57,9 @@ class MainWindow : public QMainWindow
 
     void
     loadNotes(const QString &notesPath);
+
+    void
+    loadNote(const QModelIndex &index);
 
     QListView *       m_listView;
     QTreeView *       m_treeView;

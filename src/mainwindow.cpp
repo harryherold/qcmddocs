@@ -10,6 +10,7 @@
 #include <QSizePolicy>
 #include <QSplitter>
 #include <QStringListModel>
+#include <QTextEdit>
 #include <QToolBar>
 #include <QTreeView>
 #include <QWidget>
@@ -174,18 +175,7 @@ MainWindow::unsetMarker()
 void
 MainWindow::setupConnects()
 {
-    connect(m_listView, &QListView::clicked, this, [this](const QModelIndex &index) {
-        auto file_path    = m_fileListModel->data(index).toString();
-        m_currentDocument = m_noteCollection.getNote(file_path);
-
-        if (m_textEdit->document() != nullptr)
-        {
-            unsetMarker();
-        }
-
-        m_textEdit->setDocument(&m_currentDocument->document());
-        m_treeModel->setDocumentHeaders(m_currentDocument->headers());
-    });
+    connect(m_listView, &QListView::clicked, this, &MainWindow::loadNote);
 
     connect(m_treeView, &QTreeView::clicked, this, [this](const QModelIndex &index) {
         const Tag &t = m_treeModel->data(index);
@@ -239,5 +229,25 @@ MainWindow::loadNotes(const QString &notesPath)
         setWindowTitle(notesPath);
         m_noteCollection.setCollectionPath(notesPath);
         m_fileListModel->setStringList(m_noteCollection.noteFiles());
+        if (m_fileListModel->rowCount() > 0)
+        {
+            m_listView->setCurrentIndex(m_fileListModel->index(0));
+            loadNote(m_fileListModel->index(0));
+        }
     }
+}
+
+void
+MainWindow::loadNote(const QModelIndex &index)
+{
+    auto file_path    = m_fileListModel->data(index).toString();
+    m_currentDocument = m_noteCollection.getNote(file_path);
+
+    if (m_textEdit->document() != nullptr)
+    {
+        unsetMarker();
+    }
+
+    m_textEdit->setDocument(&m_currentDocument->document());
+    m_treeModel->setDocumentHeaders(m_currentDocument->headers());
 }
