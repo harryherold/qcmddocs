@@ -46,7 +46,7 @@ class NoteDocument
     SharedNoteTreePtr<Tag>
     headers();
 
-    void
+    bool
     save();
 
     NoteHighlighter *

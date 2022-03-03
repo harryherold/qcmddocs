@@ -56,23 +56,22 @@ NoteDocument::headers()
     return m_headerTreeRoot;
 }
 
-void
+bool
 NoteDocument::save()
 {
     auto currentHash = createDocumentHash(m_document);
     if (m_documentHash == currentHash)
     {
         qDebug() << "No changes since the last save/load.";
-        return;
+        return false;
     }
 
     auto file = QFile{m_filePath};
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         qDebug() << "Could not open file " << m_filePath << " failed!";
-        return;
+        return false;
     }
-
     QTextStream fileOut(&file);
     fileOut << m_document.toPlainText();
     file.close();
@@ -80,6 +79,7 @@ NoteDocument::save()
     m_headerTreeRoot->removeChilds();
     parseHeaders();
     m_documentHash = currentHash;
+    return true;
 }
 
 void

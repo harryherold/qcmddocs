@@ -213,8 +213,11 @@ MainWindow::open()
 void
 MainWindow::save()
 {
-    m_currentDocument->save();
-    m_treeModel->setDocumentHeaders(m_currentDocument->headers());
+    auto hasChanges = m_currentDocument->save();
+    if (hasChanges)
+    {
+        m_treeModel->setDocumentHeaders(m_currentDocument->headers());
+    }
 }
 
 void
