@@ -32,7 +32,7 @@ class MainWindow : public QMainWindow
     createNote();
 
     void
-    increaseFontSize();
+    adjustPointSizeBy(int pointSize);
 
   private:
     QListView *       m_listView;
