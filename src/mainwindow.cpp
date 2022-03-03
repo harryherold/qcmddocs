@@ -8,6 +8,7 @@
 #include <QListView>
 #include <QMenuBar>
 #include <QSizePolicy>
+#include <QSplitter>
 #include <QStringListModel>
 #include <QToolBar>
 #include <QTreeView>
@@ -17,7 +18,7 @@
 #include <note_collection.hpp>
 #include <note_document.hpp>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(const QString &notesPath, QWidget *parent)
     : QMainWindow(parent), m_listView(new QListView(this)), m_treeView(new QTreeView(this)),
       m_textEdit(new QTextEdit(this)), m_fileListModel(new QStringListModel(this))
 {
@@ -27,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupConnects();
     setWindowTitle("QCmdDocs");
     resize({1200, 600});
+    loadNotes(notesPath);
 }
 
 void
@@ -38,8 +40,6 @@ MainWindow::setupViews()
     m_treeModel = new TreeModel(this);
     m_treeView->setModel(m_treeModel);
 }
-
-#include <QSplitter>
 
 void
 MainWindow::setupLayout()
@@ -202,11 +202,7 @@ MainWindow::open()
     if (dialog.exec())
     {
         auto paths = dialog.selectedFiles();
-        m_notePath = paths.front();
-        setWindowTitle(m_notePath);
-
-        m_noteCollection.setCollectionPath(m_notePath);
-        m_fileListModel->setStringList(m_noteCollection.noteFiles());
+        loadNotes(paths.front());
     }
 }
 
@@ -232,5 +228,16 @@ MainWindow::createNote()
         int new_idx = m_fileListModel->rowCount();
         m_fileListModel->insertRow(new_idx);
         m_fileListModel->setData(m_fileListModel->index(new_idx), file);
+    }
+}
+
+void
+MainWindow::loadNotes(const QString &notesPath)
+{
+    if (notesPath.isEmpty() == false)
+    {
+        setWindowTitle(notesPath);
+        m_noteCollection.setCollectionPath(notesPath);
+        m_fileListModel->setStringList(m_noteCollection.noteFiles());
     }
 }

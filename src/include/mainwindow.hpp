@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
   public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(const QString &notesPath, QWidget *parent = nullptr);
 
   public slots:
     void
@@ -35,16 +35,6 @@ class MainWindow : public QMainWindow
     adjustPointSizeBy(int pointSize);
 
   private:
-    QListView *       m_listView;
-    QTreeView *       m_treeView;
-    QTextEdit *       m_textEdit;
-    QStringListModel *m_fileListModel;
-    TreeModel *       m_treeModel;
-
-    QString        m_notePath;
-    NoteCollection m_noteCollection;
-    NotePtr        m_currentDocument;
-
     void
     setupViews();
     void
@@ -62,4 +52,16 @@ class MainWindow : public QMainWindow
 
     void
     unsetMarker();
+
+    void
+    loadNotes(const QString &notesPath);
+
+    QListView *       m_listView;
+    QTreeView *       m_treeView;
+    QTextEdit *       m_textEdit;
+    QStringListModel *m_fileListModel;
+    TreeModel *       m_treeModel;
+
+    NoteCollection m_noteCollection;
+    NotePtr        m_currentDocument;
 };

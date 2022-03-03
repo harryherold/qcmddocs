@@ -5,7 +5,6 @@
 #include <QTextDocument>
 #include <QtAlgorithms>
 
-
 #include <note_tree.hpp>
 #include <tree_model.hpp>
 
