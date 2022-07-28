@@ -27,9 +27,9 @@ MainWindow::MainWindow(const QString &notesPath, QWidget *parent)
     setupLayout();
     setupMenu();
     setupConnects();
+    loadNotes(notesPath);
     setWindowTitle("QCmdDocs");
     resize({1200, 600});
-    loadNotes(notesPath);
 }
 
 void
@@ -40,6 +40,7 @@ MainWindow::setupViews()
 
     m_treeModel = new TreeModel(this);
     m_treeView->setModel(m_treeModel);
+    m_treeView->setItemsExpandable(false);
 }
 
 void
@@ -203,6 +204,7 @@ MainWindow::save()
     if (hasChanges)
     {
         m_treeModel->setDocumentHeaders(m_currentDocument->headers());
+        m_treeView->expandAll();
     }
 }
 
@@ -250,4 +252,5 @@ MainWindow::loadNote(const QModelIndex &index)
 
     m_textEdit->setDocument(&m_currentDocument->document());
     m_treeModel->setDocumentHeaders(m_currentDocument->headers());
+    m_treeView->expandAll();
 }
